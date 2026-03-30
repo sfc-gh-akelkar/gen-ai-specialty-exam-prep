@@ -18,81 +18,31 @@ Interactive Streamlit quiz app with **132 scenario-based questions** mapped to l
 - Domain-by-domain score breakdown
 - Progress tracking during quiz
 
-## Deploy to Snowflake (Streamlit in Snowflake)
+## Deploy to Snowflake (easiest)
 
-### Prerequisites
+1. Open **Snowsight** > **Projects** > **Streamlit** > **+ Streamlit App**
+2. Pick a database, schema, and warehouse
+3. Replace the sample code with the contents of [`streamlit_app.py`](streamlit_app.py)
+4. Click **Run** — that's it
 
-- [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli/index) v3.14.0+
-- A Snowflake account with a configured CLI connection
-- A compute pool (CPU, any size) with USAGE granted to your role
-- CREATE STREAMLIT privilege on the target schema
+To share with teammates, grant them access:
 
-### Step 1: Clone the repo
+```sql
+GRANT USAGE ON STREAMLIT <db>.<schema>.SNOWPRO_GENAI_QUIZ TO ROLE <team_role>;
+```
+
+## Deploy via Snowflake CLI (advanced)
+
+If you prefer CLI deployment, edit `snowflake.yml` with your database, schema, warehouse, and compute pool, then:
 
 ```bash
 git clone https://github.com/sfc-gh-akelkar/gen-ai-specialty-exam-prep.git
 cd gen-ai-specialty-exam-prep
-```
-
-### Step 2: Edit `snowflake.yml`
-
-Update the values to match your account:
-
-```yaml
-definition_version: 2
-entities:
-  snowpro_genai_quiz:
-    type: streamlit
-    identifier:
-      name: SNOWPRO_GENAI_QUIZ
-      database: <YOUR_DATABASE>       # e.g. SANDBOX
-      schema: <YOUR_SCHEMA>           # e.g. PUBLIC
-    query_warehouse: <YOUR_WAREHOUSE> # e.g. COMPUTE_WH
-    runtime_name: SYSTEM$ST_CONTAINER_RUNTIME_PY3_11
-    compute_pool: <YOUR_COMPUTE_POOL> # e.g. XS_COMPUTE_POOL
-    main_file: streamlit_app.py
-    artifacts:
-      - streamlit_app.py
-      - pyproject.toml
-```
-
-**Finding your values:**
-
-```sql
--- List compute pools you have access to
-SHOW COMPUTE POOLS;
-
--- If you need to create one (requires SYSADMIN or equivalent)
-CREATE COMPUTE POOL MY_STREAMLIT_POOL
-  MIN_NODES = 1
-  MAX_NODES = 1
-  INSTANCE_FAMILY = CPU_X64_XS
-  AUTO_SUSPEND_SECS = 300
-  AUTO_RESUME = TRUE;
-
-GRANT USAGE ON COMPUTE POOL MY_STREAMLIT_POOL TO ROLE <YOUR_ROLE>;
-```
-
-### Step 3: Deploy
-
-```bash
+# edit snowflake.yml
 snow streamlit deploy --replace --connection <YOUR_CONNECTION>
 ```
 
-The CLI will print the Snowsight URL when complete. You can also find it under **Projects > Streamlit** in Snowsight.
-
-### Step 4: Share with others
-
-Once deployed, grant access to teammates:
-
-```sql
-GRANT USAGE ON DATABASE <YOUR_DATABASE> TO ROLE <TEAM_ROLE>;
-GRANT USAGE ON SCHEMA <YOUR_DATABASE>.<YOUR_SCHEMA> TO ROLE <TEAM_ROLE>;
-GRANT USAGE ON WAREHOUSE <YOUR_WAREHOUSE> TO ROLE <TEAM_ROLE>;
-GRANT USAGE ON STREAMLIT <YOUR_DATABASE>.<YOUR_SCHEMA>.SNOWPRO_GENAI_QUIZ TO ROLE <TEAM_ROLE>;
-```
-
-## Run Locally (optional)
+## Run Locally
 
 ```bash
 pip install -r requirements.txt
