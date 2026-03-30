@@ -1,0 +1,15 @@
+definition_version: 2
+entities:
+  snowpro_genai_quiz:
+    type: streamlit
+    identifier:
+      name: SNOWPRO_GENAI_QUIZ
+      database: SANDBOX
+      schema: COCO_DEMO
+    query_warehouse: APP_WH
+    runtime_name: SYSTEM$ST_CONTAINER_RUNTIME_PY3_11
+    compute_pool: XS_COMPUTE_POOL
+    main_file: streamlit_app.py
+    artifacts:
+      - streamlit_app.py
+      - pyproject.toml
